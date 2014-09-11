@@ -118,6 +118,142 @@ def textgrid_to_dict(filepath):
     print "\n\n"
     return data
 
+
+'''
+    Output intended to be ready for import into R
+    
+    Table of Main (each value of main in a separate column, headers being the keys)
+    
+        dirpath    filename    transcriber    'File type'    'Object class'    xmin    xmax    Ntiers(=size)
+    
+    Table of Item
+    
+        dirpath    filename    transcriber    TierNum(=itemNum)    TierName(=name)    intervalNum    xmin    xmax    text
+    
+    common key(s) between tables Item and Main would be 'filepath', 'filename', and 'transcriber' 
+    
+    Created on Aug 8, 2012
+    @author: Scott Hajek
+
+    Modified on August 16th, 2012
+    @authors: Scott Hajek and Nathan Couch
+
+    Changed to a function called by main.py
+
+    Added directory path, filename, and transcriber information to the output.
+'''
+
+
+
+def printtoFile(textgrids):
+
+	import os, re
+	import parseTextGrid
+	
+	#sets the directory where the output files will be saved to.
+	outputDir = '/Users/assistants/Desktop/parsN/outputDir/'
+	if not os.path.exists(outputDir):
+		os.makedirs(outputDir)
+	
+	#===============================================
+	# creates the files for the output, with headers
+	#===============================================
+
+	# define item separator/delimiter
+	t='\t'
+
+	# creates headers for the description file
+	f1 = open(outputDir + 'sound_file_desc', 'w')
+
+	mainfieldsTuple = ('dirpath','filename','transcriber','File type','Object class','xmin', 'xmax', 'size')	
+
+#	first=True
+#	for d in mainfieldsTuple:
+#	    if first:
+#		f1.write(d)
+#		first=False
+#	    else:
+#		f1.write(t + d)
+
+	first = True
+	for d in mainfieldsTuple:
+		if not first: d = t+d
+		else: first=False
+		f1.write(d)
+		
+
+	f1.write("\n")
+
+	# create headers for interval File
+	f2 = open(outputDir + 'sound_file_intervals', 'w')
+
+	itemfieldsTuple = ('dirpath','filename','transcriber','File type','tierName','intervNum','xmin','xmax','text')
+
+#	first=True
+#	for d in mainfieldsTuple:
+#	    if first:
+#		f1.write(d)
+#		first=False
+#	    else:
+#		f1.write(t + d)
+
+	for c in itemfieldsTuple:
+		f2.write(c + t)
+
+	f2.write("\n")
+
+	for textgrid_path in textgrids:
+		
+		#retrieves filepath, filename, and transcriber
+		fname = os.path.basename(textgrid_path)		
+		fdir = os.path.dirname(textgrid_path)
+		transPattern = re.search('bmp\.(\w+)\.TextGrid',fname)
+		
+		if transPattern:  # if there was a match to the pattern
+			transcriber = transPattern.group(1)
+		else:
+			transcriber = 'BLANK'
+		
+		os.chdir(fdir)
+
+		#passes the file to parseTextGrid, which returns a dictionary.
+		dic = parseTextGrid.textgrid(fname)
+
+		#===============================================================================
+		# Create Whole-sound-file descriptors table
+		#===============================================================================
+
+		for x in mainfieldsTuple:
+			if x == 'dirpath':
+				f1.write(fdir)
+			elif x == 'filename':
+				f1.write(t + fname)
+			elif x == 'transcriber':
+				f1.write(t + transcriber)
+			else:
+				f1.write(t + dic['main'][x])
+
+		f1.write("\n")
+
+		#===============================================================================
+		# Interval data (aka 'item')
+		#===============================================================================
+
+		for i in range(1,len(dic['item'])+1):
+			ith = dic['item'][i]
+			name = ith['name']
+			for j in range(1, len(ith['intervals']) + 1):
+				jth = ith['intervals'][j]
+				xmin = jth['xmin']
+				xmax = jth['xmax']
+				text = jth['text']
+				f2.write(fdir + t + fname + t + transcriber + t + str(i) + t + name + t + str(j) + t + xmin + t + xmax + t + text + "\n")
+
+	f1.close()
+	f2.close()		
+
+
+
 if __name__ == '__main__':
     # test out the function textgrid as defined above
     
