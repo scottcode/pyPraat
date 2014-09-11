@@ -35,9 +35,12 @@ Created on Aug 6, 2012
 @author: Scott Hajek
 '''
 
+import os
+import re
+
+
 def textgrid_to_dict(filepath):
-    import re
-    
+
     # read in file
     f = open(filepath)
     lines = f.readlines()
@@ -119,39 +122,35 @@ def textgrid_to_dict(filepath):
     return data
 
 
-'''
-    Output intended to be ready for import into R
-    
-    Table of Main (each value of main in a separate column, headers being the keys)
-    
-        dirpath    filename    transcriber    'File type'    'Object class'    xmin    xmax    Ntiers(=size)
-    
-    Table of Item
-    
-        dirpath    filename    transcriber    TierNum(=itemNum)    TierName(=name)    intervalNum    xmin    xmax    text
-    
-    common key(s) between tables Item and Main would be 'filepath', 'filename', and 'transcriber' 
-    
-    Created on Aug 8, 2012
-    @author: Scott Hajek
-
-    Modified on August 16th, 2012
-    @authors: Scott Hajek and Nathan Couch
-
-    Changed to a function called by main.py
-
-    Added directory path, filename, and transcriber information to the output.
-'''
 
 
 
-def printtoFile(textgrids):
-
-	import os, re
-	import parseTextGrid
+def printtoFile(textgrids, outputDir):
+	'''
+	    Output intended to be ready for import into R
+	    
+	    Table of Main (each value of main in a separate column, headers being the keys)
+	    
+	        dirpath    filename    transcriber    'File type'    'Object class'    xmin    xmax    Ntiers(=size)
+	    
+	    Table of Item
+	    
+	        dirpath    filename    transcriber    TierNum(=itemNum)    TierName(=name)    intervalNum    xmin    xmax    text
+	    
+	    common key(s) between tables Item and Main would be 'filepath', 'filename', and 'transcriber' 
+	    
+	    Created on Aug 8, 2012
+	    @author: Scott Hajek
 	
+	    Modified on August 16th, 2012
+	    @authors: Scott Hajek and Nathan Couch
+	
+	    Changed to a function called by main.py
+	
+	    Added directory path, filename, and transcriber information to the output.
+	'''
+
 	#sets the directory where the output files will be saved to.
-	outputDir = '/Users/assistants/Desktop/parsN/outputDir/'
 	if not os.path.exists(outputDir):
 		os.makedirs(outputDir)
 	
@@ -217,7 +216,7 @@ def printtoFile(textgrids):
 		os.chdir(fdir)
 
 		#passes the file to parseTextGrid, which returns a dictionary.
-		dic = parseTextGrid.textgrid(fname)
+		dic = textgrid_to_dict(fname)
 
 		#===============================================================================
 		# Create Whole-sound-file descriptors table
