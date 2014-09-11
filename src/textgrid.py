@@ -1,5 +1,5 @@
 '''
-parseTextGrid.py
+textgrid.py
 
 Purpose: to read in TextGrid files 
     (which are created with Praat for annotation of sound files)
@@ -35,11 +35,10 @@ Created on Aug 6, 2012
 @author: Scott Hajek
 '''
 
-def textgrid(filepath):
+def textgrid_to_dict(filepath):
     import re
     
     # read in file
-    #filepath = "/Volumes/Shared/Lab_onGreen/Ryan/Big Ben/Analog Absolutes/AASub21/status_1_5_6/21abs_214_6_right_c_2_9_p_bmp.RAS.TextGrid"
     f = open(filepath)
     lines = f.readlines()
     
@@ -119,7 +118,8 @@ def textgrid(filepath):
     print "\n\n"
     return data
 
-# test out the function textgrid as defined above
-
-#filepath = "/Volumes/Shared/Lab_onGreen/Ryan/Big Ben/Analog Absolutes/AASub21/status_1_5_6/21abs_214_6_right_c_2_9_p_bmp.RAS.TextGrid"
-#test=textgrid(filepath)
+if __name__ == '__main__':
+    # test out the function textgrid as defined above
+    
+    filepath = "/path/to/file.TextGrid"
+    test = textgrid_to_dict(filepath)
